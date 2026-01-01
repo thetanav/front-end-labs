@@ -4,18 +4,19 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryClient } from "@/components/providers";
+import { Trash2, Edit } from "lucide-react";
 
-export function Todo({ todo }: { todo: TodoType }) {
+export const Todo = memo(function Todo({ todo }: { todo: TodoType }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [open, setOpen] = useState(false);
@@ -100,48 +101,72 @@ export function Todo({ todo }: { todo: TodoType }) {
   });
 
   return (
-    <div key={todo._id} className="flex gap-6 items-center my-2">
-      <Checkbox
-        checked={todo.isComplete}
-        onCheckedChange={() => toggleStatus(todo._id)}
-      />
-      <div className="flex flex-col gap-1">
-        <h3>{todo.title}</h3>
-        <p>{todo.description}</p>
-      </div>
-      <Button onClick={() => deleteMutate(todo._id)}>DEL</Button>
-      <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
-        <DialogTrigger asChild>
+    <div>
+      <div className="flex items-center gap-4">
+        <Checkbox
+          checked={todo.isComplete}
+          onCheckedChange={() => toggleStatus(todo._id)}
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3
+              className={`text-md font-medium truncate ${
+                todo.isComplete ? "line-through text-muted-foreground" : ""
+              }`}>
+              {todo.title}
+            </h3>
+          </div>
+          <p
+            className={`text-xs truncate text-muted-foreground ${
+              todo.isComplete ? "line-through" : ""
+            }`}>
+            {todo.description}
+          </p>
+        </div>
+        <div className="flex gap-1">
           <Button
-            onClick={() => {
-              setOpen(true);
-              setTitle(todo.title);
-              setDescription(todo.description);
-            }}>
-            EDIT
+            size="icon-sm"
+            variant="ghost"
+            onClick={() => deleteMutate(todo._id)}>
+            <Trash2 className="h-3 w-3" />
           </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit the todo!</DialogTitle>
-            <DialogDescription asChild>
-              <div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                onClick={() => {
+                  setTitle(todo.title);
+                  setDescription(todo.description);
+                }}>
+                <Edit className="h-3 w-3" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle>Edit Todo</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3 py-2">
                 <Input
-                  placeholder="Todo title"
+                  placeholder="Title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
                 <Input
-                  placeholder="Todo description"
+                  placeholder="Description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
-                <Button onClick={() => editMutate(todo._id)}>SAVE</Button>
               </div>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+              <DialogFooter>
+                <Button onClick={() => editMutate(todo._id)} size="sm">
+                  Save
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
     </div>
   );
-}
+});
