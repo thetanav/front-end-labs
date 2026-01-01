@@ -14,15 +14,20 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { queryClient } from "@/components/providers";
-import { Loader } from "lucide-react";
 
 export function Todo({ todo }: { todo: TodoType }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [open, setOpen] = useState(false);
 
-  const { mutate: toggleStatus, isPending: togglePending } = useMutation({
+  const { mutate: toggleStatus } = useMutation({
     mutationFn: async (id: string) => {
+      queryClient.setQueryData(["todo"], (old: any) => ({
+        ...old,
+        data: old.data.map((todo: any) =>
+          todo._id === id ? { ...todo, isComplete: !todo.isComplete } : todo
+        ),
+      }));
       const res = await fetch(
         "https://api.freeapi.app/api/v1/todos/toggle/status/" + id,
         {
@@ -30,31 +35,49 @@ export function Todo({ todo }: { todo: TodoType }) {
         }
       );
       const data = await res.json();
-      queryClient.setQueryData(["todo"], (old: any) => ({
-        ...old,
-        data: old.data.map((todo: any) =>
-          todo._id === data.data._id ? data.data : todo
-        ),
-      }));
-      toast("Todo status toggled!");
+      if (data.statusCode == 200) {
+        toast.success("Todo status toggled!");
+      } else {
+        toast.error("Todo toggle failed!");
+        queryClient.invalidateQueries({ queryKey: ["todo"] });
+      }
     },
   });
 
-  const { mutate: deleteMutate, isPending: deletePending } = useMutation({
+  const { mutate: deleteMutate } = useMutation({
     mutationFn: async (id: string) => {
-      await fetch("https://api.freeapi.app/api/v1/todos/" + id, {
-        method: "DELETE",
-      });
       queryClient.setQueryData(["todo"], (old: any) => ({
         ...old,
         data: old.data.filter((todo: any) => todo._id !== id),
       }));
-      toast.success("Todo deleted!");
+      const res = await fetch("https://api.freeapi.app/api/v1/todos/" + id, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.statusCode == 200) {
+        toast.success("Todo deleted!");
+      } else {
+        toast.error("Todo delete failed!");
+        queryClient.invalidateQueries({ queryKey: ["todo"] });
+      }
     },
   });
 
-  const { mutate: editMutate, isPending: editPending } = useMutation({
+  const { mutate: editMutate } = useMutation({
     mutationFn: async (id: string) => {
+      if (title.trim() === "" || description.trim() === "") {
+        toast.error("Please fill in all fields");
+        return;
+      }
+      queryClient.setQueryData(["todo"], (old: any) => ({
+        ...old,
+        data: old.data.map((todo: any) =>
+          todo._id === id ? { ...todo, title, description } : todo
+        ),
+      }));
+      setOpen(false);
+      setTitle("");
+      setDescription("");
       const res = await fetch("https://api.freeapi.app/api/v1/todos/" + id, {
         method: "PATCH",
         headers: {
@@ -67,41 +90,26 @@ export function Todo({ todo }: { todo: TodoType }) {
         }),
       });
       const data = await res.json();
-      queryClient.setQueryData(["todo"], (old: any) => ({
-        ...old,
-        data: old.data.map((todo: any) =>
-          todo._id === data.data._id ? data.data : todo
-        ),
-      }));
-      setOpen(false);
-      setTitle("");
-      setDescription("");
-      toast.success("Todo edit successful!");
+      if (data.statusCode == 200) {
+        toast.success("Todo edited!");
+      } else {
+        toast.error(data.message);
+        queryClient.invalidateQueries({ queryKey: ["todo"] });
+      }
     },
   });
 
   return (
-    <div
-      key={todo._id}
-      className="flex gap-6 items-center my-2"
-      aria-disabled={deletePending}>
-      {togglePending ? (
-        <Loader className="w-4 h-4 animate-spin" />
-      ) : (
-        <Checkbox
-          checked={todo.isComplete}
-          onCheckedChange={() => toggleStatus(todo._id)}
-          disabled={togglePending}
-        />
-      )}
+    <div key={todo._id} className="flex gap-6 items-center my-2">
+      <Checkbox
+        checked={todo.isComplete}
+        onCheckedChange={() => toggleStatus(todo._id)}
+      />
       <div className="flex flex-col gap-1">
         <h3>{todo.title}</h3>
         <p>{todo.description}</p>
       </div>
-      <Button onClick={() => deleteMutate(todo._id)} disabled={deletePending}>
-        {deletePending && <Loader className="w-4 h-4 animate-spin" />}
-        DEL
-      </Button>
+      <Button onClick={() => deleteMutate(todo._id)}>DEL</Button>
       <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
         <DialogTrigger asChild>
           <Button
@@ -119,21 +127,16 @@ export function Todo({ todo }: { todo: TodoType }) {
             <DialogDescription asChild>
               <div>
                 <Input
-                  placeholder="Add a new todo"
+                  placeholder="Todo title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
                 <Input
-                  placeholder="Add a new todo"
+                  placeholder="Todo description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
-                <Button
-                  onClick={() => editMutate(todo._id)}
-                  disabled={editPending}>
-                  {editPending && <Loader className="w-4 h-4 animate-spin" />}
-                  SAVE
-                </Button>
+                <Button onClick={() => editMutate(todo._id)}>SAVE</Button>
               </div>
             </DialogDescription>
           </DialogHeader>

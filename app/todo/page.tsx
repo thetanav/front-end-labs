@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Todo } from "./Todo";
 import { queryClient } from "@/components/providers";
 import { Loader } from "lucide-react";
+import { toast } from "sonner";
 
 export interface TodoType {
   _id: string;
@@ -19,14 +20,31 @@ export default function Page() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["todo"],
     queryFn: () =>
       fetch("https://api.freeapi.app/api/v1/todos").then((res) => res.json()),
   });
 
-  const { mutate: addMutate, isPending: addPending } = useMutation({
+  const { mutate: addMutate } = useMutation({
     mutationFn: async () => {
+      if (title.trim() === "" || description.trim() === "") {
+        toast.error("Please fill in all fields");
+        return;
+      }
+
+      const tempTodo = {
+        _id: `temp-${Date.now()}`,
+        title,
+        description,
+        isComplete: false,
+      };
+
+      queryClient.setQueryData(["todo"], (old: any) => ({
+        ...old,
+        data: [...old.data, tempTodo],
+      }));
+
       const res = await fetch("https://api.freeapi.app/api/v1/todos", {
         method: "POST",
         headers: {
@@ -41,11 +59,19 @@ export default function Page() {
       const data = await res.json();
       setTitle("");
       setDescription("");
-      // setTodoData([...todoData, data.data]);
-      queryClient.setQueryData(["todo"], (old: any) => ({
-        ...old,
-        data: [...old.data, data.data],
-      }));
+      toast.success("Todo added!");
+
+      if (data.statusCode === 201) {
+        queryClient.setQueryData(["todo"], (old: any) => ({
+          ...old,
+          data: old.data.map((todo: any) =>
+            todo._id === tempTodo._id ? data.data : todo
+          ),
+        }));
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["todo"] });
+        toast.error("An error occurred");
+      }
     },
   });
 
@@ -53,22 +79,20 @@ export default function Page() {
     <div className="container mx-auto">
       <div>
         <Input
-          placeholder="Add a new todo"
+          placeholder="Todo title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <Input
-          placeholder="Add a new todo"
+          placeholder="Todo description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <Button onClick={() => addMutate()} disabled={addPending}>
-          {addPending && <Loader className="w-4 h-4 animate-spin" />}
-          ADD
-        </Button>
+        <Button onClick={() => addMutate()}>ADD</Button>
       </div>
 
       <div>
+        {isLoading && <Loader className="w-4 h-4 animate-spin" />}
         {data &&
           data.data.map((todo: TodoType) => (
             <Todo key={todo._id} todo={todo} />
