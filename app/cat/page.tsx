@@ -18,9 +18,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
-export default function Page() {
+function CatContent() {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [search, setSearch] = useQueryState("q", parseAsString.withDefault(""));
 
@@ -261,5 +261,13 @@ export default function Page() {
             ))}
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="pt-4 max-w-3xl mx-auto">Loading...</div>}>
+      <CatContent />
+    </Suspense>
   );
 }
