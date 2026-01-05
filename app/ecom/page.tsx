@@ -2,13 +2,14 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
-import { Fragment, useRef, useEffect } from "react";
+import { Fragment, useRef, useEffect, Suspense } from "react";
 import { Product } from "./Product";
 import { CartButton } from "./CartButton";
 import { Loader } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
-export default function Page() {
-  const [search] = useQueryState("q", parseAsString.withDefault(""));
+function EcomContent() {
+  const [search, setSearch] = useQueryState("q", parseAsString.withDefault(""));
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -27,9 +28,8 @@ export default function Page() {
       getNextPageParam: (lastPage) => {
         if (lastPage.data.nextPage) {
           return lastPage.data.page + 1;
-        } else {
-          return lastPage.data.page;
         }
+        return undefined;
       },
     });
 
@@ -52,13 +52,22 @@ export default function Page() {
         observer.unobserve(observerTarget.current);
       }
     };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, setSearch]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 max-w-3xl mx-auto">
       <nav className="w-full flex items-center justify-between border-b pb-4 pt-4 sticky top-0 left-0 right-0 bg-background backdrop-blur-3xl z-50">
         <h1 className="text-lg font-bold">Foodie</h1>
-        <CartButton />
+        <div className="flex items-center gap-2">
+          <Input
+            type="search"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-40"
+          />
+          <CartButton />
+        </div>
       </nav>
       <div className="grid grid-cols-3">
         {data &&
@@ -80,5 +89,13 @@ export default function Page() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="p-4">Loading...</div>}>
+      <EcomContent />
+    </Suspense>
   );
 }

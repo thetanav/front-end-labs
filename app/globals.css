@@ -123,3 +123,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.squi {
+  corner-shape: squircle;
+  border-radius: 3rem;
+}

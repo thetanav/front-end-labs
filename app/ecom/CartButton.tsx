@@ -17,7 +17,7 @@ export const CartButton = () => {
 
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant={"ghost"} className="relative">
           <ShoppingCart /> My Cart
           <p className="absolute -top-2 -right-2 font-mono px-1 py-0 bg-blue-500 rounded-full text-background">
@@ -31,10 +31,14 @@ export const CartButton = () => {
         </DialogHeader>
         <div className="flex flex-col gap-3 max-h-96 overflow-y-auto">
           {cart.length === 0 ? (
-            <p className="text-muted-foreground text-center py-4">Your cart is empty</p>
+            <p className="text-muted-foreground text-center py-4">
+              Your cart is empty
+            </p>
           ) : (
             cart.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 p-2 rounded-lg border">
+              <div
+                key={item.id}
+                className="flex items-center gap-3 p-2 rounded-lg border">
                 <img
                   src={item.thumbnail}
                   alt={item.name}
@@ -42,7 +46,9 @@ export const CartButton = () => {
                 />
                 <div className="flex-1">
                   <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">Quantity: {item.count}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Quantity: {item.count}
+                  </p>
                 </div>
               </div>
             ))

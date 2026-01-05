@@ -18,7 +18,7 @@ export const Product = ({ product }: { product: any }) => {
         <img
           src={product.strMealThumb}
           draggable={false}
-          className="hover:brightness-90 active:scale-95 squi w-full"
+          className="hover:brightness-90 active:scale-95 squi"
         />
       </div>
       <div className="flex items-center justify-between">
@@ -46,7 +46,9 @@ export const Product = ({ product }: { product: any }) => {
           <Button
             variant={"outline"}
             size="icon-sm"
-            onClick={() => addToCart(product.idMeal, product.strMeal, product.strMealThumb)}>
+            onClick={() =>
+              addToCart(product.idMeal, product.strMeal, product.strMealThumb)
+            }>
             <ShoppingCart />
           </Button>
         )}
