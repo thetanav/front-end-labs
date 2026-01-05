@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Cat, ListTodo } from "lucide-react";
+import { Cat, ListTodo, ShoppingBag } from "lucide-react";
 
 export default function Home() {
   return (
@@ -26,6 +26,12 @@ export default function Home() {
               <Button className="w-full gap-2">
                 <ListTodo className="h-4 w-4" />
                 Todo
+              </Button>
+            </Link>
+            <Link href="/ecom">
+              <Button className="w-full gap-2">
+                <ShoppingBag className="h-4 w-4" />
+                Ecommerce
               </Button>
             </Link>
           </CardContent>
