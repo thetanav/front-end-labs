@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Cat, ListTodo, ShoppingBag } from "lucide-react";
+import { BarChartHorizontalBigIcon, Cat, ListTodo, ShoppingBag } from "lucide-react";
 
 export default function Home() {
   return (
@@ -19,7 +19,7 @@ export default function Home() {
             <Link href="/cat">
               <Button className="w-full gap-2">
                 <Cat className="h-4 w-4" />
-                Get Started
+                Cats
               </Button>
             </Link>
             <Link href="/todo">
@@ -32,6 +32,12 @@ export default function Home() {
               <Button className="w-full gap-2">
                 <ShoppingBag className="h-4 w-4" />
                 Ecommerce
+              </Button>
+            </Link>
+            <Link href="/tasks">
+              <Button className="w-full gap-2">
+                <BarChartHorizontalBigIcon className="h-4 w-4" />
+                Kanban Board
               </Button>
             </Link>
           </CardContent>

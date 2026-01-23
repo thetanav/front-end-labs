@@ -1,10 +1,10 @@
 "use client";
 
-import { GripVertical } from "lucide-react"
-import { useState } from "react";
-// import nanoid from nanoid;
+import { GripVertical, Pencil, Plus } from "lucide-react"
+import { useEffect, useState } from "react";
+import { nanoid } from "nanoid";
 import { boardData } from "./data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 type Board = {
   columns: {
@@ -25,36 +25,70 @@ export default function Board() {
     dropIndex: -1
   })
 
+  useEffect(() => {
+    const data = localStorage.getItem("kanban")
+    if (data) {
+      setBoard(JSON.parse(data))
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem("kanban", JSON.stringify(board))
+  }, [board])
+
+  const addNewTask = (columnId: string) => {
+    const newTaskId = nanoid();
+    setBoard(prev => ({
+      ...prev,
+      tasks: {
+        ...prev.tasks,
+        [newTaskId]: { id: newTaskId, title: "New task" }
+      },
+      columns: prev.columns.map(col =>
+        col.id === columnId
+          ? { ...col, taskIds: [...col.taskIds, newTaskId] }
+          : col
+      )
+    }));
+  };
+
   return (
-    <div className="flex gap-2 mt-10 select-none">
+    <div className="flex gap-4 mt-10 select-none">
       {board.columns.map(i => (
         <div
           key={i.id}
-          className="rounded-md border min-h-72 w-56 p-2"
+          className="rounded-lg border bg-card min-h-72 w-64 overflow-hidden p-3 shadow-sm"
           onDragOver={(e) => {
             e.preventDefault();
             if (meta.from !== i.id) {
-              // Only update if moving to different column
               setMeta({ ...meta, to: i.id, dropIndex: i.taskIds.length });
             }
           }}
         >
-          <h2 className="text-xl font-bold">{i.title}</h2>
-          <div className="space-y-2">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">{i.title}</h2>
+            <Button
+              onClick={() => addNewTask(i.id)}
+              variant={"ghost"}
+              size={"icon"}
+            >
+              <Plus className="h-4 w-4 group-hover:scale-110 transition-transform" />
+            </Button>
+          </div>
+          <div className="space-y-2 min-h-[200px]">
             {i.taskIds.map((t, index) => {
               const isDragging = meta.task === t && meta.from === i.id;
               const showGhostBefore = meta.to === i.id && meta.dropIndex === index && meta.task && (meta.from !== meta.to || !isDragging);
               return (
                 <div key={t}>
-                  {/* Ghost card preview before this position */}
                   {showGhostBefore && (
-                    <div className="rounded-md border p-2 flex items-center bg-background opacity-60 border-dashed mb-2">
-                      <GripVertical className="opacity-40 h-4" />
-                      <h3 className="text-sm">{board.tasks[meta.task]?.title}</h3>
+                    <div className="rounded-lg border-2 border-dashed border-primary/50 p-3 flex items-center bg-primary/5 mb-2 transition-all duration-200">
+                      <GripVertical className="opacity-0 h-4 w-4 mr-2" />
+                      <h3 className="text-sm text-muted-foreground">{board.tasks[meta.task]?.title}</h3>
                     </div>
                   )}
                   <div
-                    className={`rounded-md border p-2 flex items-center bg-background active:cursor-grabbing cursor-grab hover:shadow-sm ${isDragging ? "opacity-50" : ""
+                    className={`group rounded-lg border bg-background p-3 flex items-center transition-all duration-200 hover:shadow-md hover:border-primary/50 active:cursor-grabbing cursor-grab ${isDragging ? 'opacity-50 scale-95' : 'opacity-100'
                       }`}
                     draggable
                     onDragStart={() => {
@@ -117,22 +151,21 @@ export default function Board() {
                       });
                     }}
                   >
-                    <GripVertical className="opacity-40 h-4" />
-                    <h3 className="text-sm">{board.tasks[t].title}</h3>
+                    <Card setBoard={setBoard} text={board.tasks[t].title} taskId={t} />
                   </div>
                 </div>
               );
             })}
             {/* Ghost card preview at the end of the list */}
             {meta.to === i.id && meta.dropIndex === i.taskIds.length && meta.task && (
-              <div className="rounded-md border p-2 flex items-center bg-background opacity-60 border-dashed mt-2">
-                <GripVertical className="opacity-40 h-4" />
-                <h3 className="text-sm">{board.tasks[meta.task]?.title}</h3>
+              <div className="rounded-lg border-2 border-dashed border-primary/50 p-3 flex items-center bg-primary/5 mt-2 transition-all duration-200">
+                <GripVertical className="opacity-0 h-4 w-4 mr-2" />
+                <h3 className="text-sm text-muted-foreground">{board.tasks[meta.task]?.title}</h3>
               </div>
             )}
             {/* Large drop zone at the bottom for easier dropping */}
             <div
-              className="min-h-16 -mx-2 -mb-2 rounded-b-md"
+              className="min-h-16"
               onDragOver={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -142,8 +175,75 @@ export default function Board() {
               }}
             />
           </div>
-        </ div >
+        </div>
       ))}
+    </div>
+  )
+}
+
+function Card({ text, setBoard, taskId }: { text: string; setBoard: any; taskId: string }) {
+  const [edit, setEdit] = useState(false);
+  const [value, setValue] = useState(text);
+
+  useEffect(() => {
+    setValue(text);
+  }, [text]);
+
+  const handleSave = () => {
+    if (value.trim() && value !== text) {
+      setBoard((prev: Board) => {
+        return {
+          ...prev,
+          tasks: {
+            ...prev.tasks,
+            [taskId]: { id: taskId, title: value.trim() }
+          }
+        }
+      });
+    } else if (!value.trim()) {
+      setValue(text); // Reset to original if empty
+    }
+    setEdit(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSave();
+    } else if (e.key === "Escape") {
+      setValue(text);
+      setEdit(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2 w-fit group/item">
+      {edit ? (
+        <>
+          <Pencil className="opacity-40 h-3 w-3 shrink-0" />
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            placeholder="Enter task title..."
+            autoFocus
+            className="outline-none text-sm flex-1 bg-transparent border-b border-primary focus:border-primary/50 transition-colors w-inherit"
+          />
+        </>
+      ) : (
+        <>
+          <GripVertical className="opacity-0 group-hover/item:opacity-40 h-4 w-4 shrink-0 transition-opacity" />
+          <h3
+            className="text-sm flex-1 cursor-text hover:text-primary transition-colors"
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setEdit(true);
+            }}
+          >
+            {text}
+          </h3>
+        </>
+      )}
     </div>
   )
 }

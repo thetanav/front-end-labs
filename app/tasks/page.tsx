@@ -1,15 +1,13 @@
-'use client'
-
+import { Suspense } from "react";
 import Board from "./Pane";
-import Pane from "./Pane";
-import { useState } from "react";
 
 export default function Page() {
-  const [board, setBoard] = useState()
   return (
-    <main className="max-w-3xl mx-auto">
-      <h1 className="text-4xl font-bold">kanban board</h1>
-      <Board />
+    <main className="max-w-3xl mx-auto pt-8 px-7">
+      <h1 className="text-xl font-bold">Kanban board</h1>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Board />
+      </Suspense>
     </main>
   )
 }
