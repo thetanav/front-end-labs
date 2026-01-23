@@ -53,11 +53,11 @@ export default function Board() {
   };
 
   return (
-    <div className="flex gap-4 mt-10 select-none">
+    <div className="flex gap-1 mt-10 select-none">
       {board.columns.map(i => (
         <div
           key={i.id}
-          className="rounded-lg border bg-card min-h-72 w-64 overflow-hidden p-3 shadow-sm"
+          className="rounded-lg border bg-card min-h-72 w-64 overflow-hidden px-4 py-2"
           onDragOver={(e) => {
             e.preventDefault();
             if (meta.from !== i.id) {
@@ -88,7 +88,7 @@ export default function Board() {
                     </div>
                   )}
                   <div
-                    className={`group rounded-lg border bg-background p-3 flex items-center transition-all duration-200 hover:shadow-md hover:border-primary/50 active:cursor-grabbing cursor-grab ${isDragging ? 'opacity-50 scale-95' : 'opacity-100'
+                    className={`group rounded-lg border bg-background p-3 flex items-center transition-all duration-200 hover:border-primary/50 active:cursor-grabbing cursor-grab ${isDragging ? 'opacity-50 scale-95' : 'opacity-100'
                       }`}
                     draggable
                     onDragStart={() => {
@@ -216,7 +216,7 @@ function Card({ text, setBoard, taskId }: { text: string; setBoard: any; taskId:
   };
 
   return (
-    <div className="flex items-center gap-2 w-fit group/item">
+    <div className="flex items-center gap-2 w-fit group/item overflow-hidden">
       {edit ? (
         <>
           <Pencil className="opacity-40 h-3 w-3 shrink-0" />
@@ -232,7 +232,7 @@ function Card({ text, setBoard, taskId }: { text: string; setBoard: any; taskId:
         </>
       ) : (
         <>
-          <GripVertical className="opacity-0 group-hover/item:opacity-40 h-4 w-4 shrink-0 transition-opacity" />
+          <GripVertical className="opacity-30 h-4 w-4 shrink-0 transition-opacity" />
           <h3
             className="text-sm flex-1 cursor-text hover:text-primary transition-colors"
             onDoubleClick={(e) => {
