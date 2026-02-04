@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChartHorizontalBigIcon, Cat, ListTodo, ShoppingBag } from "lucide-react";
+import { BarChartHorizontalBigIcon, Cat, ListTodo, ShoppingBag, WavesIcon } from "lucide-react";
 
 export default function Home() {
   return (
@@ -38,6 +38,12 @@ export default function Home() {
               <Button className="w-full gap-2">
                 <BarChartHorizontalBigIcon className="h-4 w-4" />
                 Kanban Board
+              </Button>
+            </Link>
+            <Link href="/thinking">
+              <Button className="w-full gap-2">
+                <WavesIcon className="h-4 w-4" />
+                LLM Thinking Wave
               </Button>
             </Link>
           </CardContent>
