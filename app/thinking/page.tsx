@@ -1,14 +1,37 @@
 import Shimmer from "@/components/wave";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function Page() {
   return (
-    <div>
-      <h1>Thinking Wave Animations</h1>
-      <p>This is the implementation of thinking wave animation purely in CSS that is used in almost all ai apps.</p>
-      <hr />
-      <Shimmer text="Your text here ...." />
-      <hr />
-      <pre className="bg-muted p-4 rounded-lg overflow-x-auto font-mono text-sm border">
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl font-bold">Thinking Wave Animations</h1>
+          <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+            This is the implementation of thinking wave animation purely in CSS that is used in almost all ai apps.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Live Demo
+                <Badge variant="secondary">CSS Animation</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Shimmer text="Your text here ...." />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Source Code</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-muted p-4 rounded-lg overflow-x-auto font-mono text-sm border">
 {`"use client";
 
 export default function Shimmer({ text = "thinking ...", className = "" }) {
@@ -40,7 +63,11 @@ export default function Shimmer({ text = "thinking ...", className = "" }) {
     </div>
   );
 }`}
-      </pre>
+              </pre>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }
