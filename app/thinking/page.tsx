@@ -9,12 +9,13 @@ export default function Page() {
         <div className="text-center space-y-3">
           <h1 className="text-3xl font-bold">Thinking Wave Animations</h1>
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-            This is the implementation of thinking wave animation purely in CSS that is used in almost all ai apps.
+            This is the implementation of thinking wave animation purely in CSS
+            that is used in almost all ai apps.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
+        <div className="grid gap-2 md:grid-cols-2">
+          <Card className="shadow-none">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Live Demo
@@ -26,13 +27,13 @@ export default function Page() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="shadow-none">
             <CardHeader>
               <CardTitle>Source Code</CardTitle>
             </CardHeader>
             <CardContent>
               <pre className="bg-muted p-4 rounded-lg overflow-x-auto font-mono text-sm border">
-{`"use client";
+                {`"use client";
 
 export default function Shimmer({ text = "thinking ...", className = "" }) {
   return (
@@ -43,7 +44,7 @@ export default function Shimmer({ text = "thinking ...", className = "" }) {
 
         {/* Shimmering overlay */}
         <div
-          className="absolute bg-clip-text text-transparent bg-gradient-to-r from-transparent via-black to-transparent z-10 top-0 left-0 right-0 [background-size:50%_100%] [background-repeat:no-repeat]"
+          className="absolute bg-clip-text text-transparent bg-linear-to-r from-transparent via-black to-transparent z-10 top-0 left-0 right-0 bg-size-[50%_100%] bg-no-repeat"
           style={{
             animation: "wave 1s linear infinite",
           }}>
@@ -69,5 +70,5 @@ export default function Shimmer({ text = "thinking ...", className = "" }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
