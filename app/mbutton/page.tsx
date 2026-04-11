@@ -35,8 +35,20 @@ export default function Page() {
 
             <div className="flex items-center gap-3">
               <MButton mutation={mutation}>Run mutation</MButton>
+              <MButton mutation={mutation} variant="secondary">
+                Secondary
+              </MButton>
+              <MButton mutation={mutation} variant="destructive">
+                Delete
+              </MButton>
               <MButton mutation={mutation} variant="outline">
-                Secondary action
+                Outline
+              </MButton>
+              <MButton mutation={mutation} variant="ghost">
+                Ghost
+              </MButton>
+              <MButton mutation={mutation} variant="link">
+                Link
               </MButton>
             </div>
           </div>
