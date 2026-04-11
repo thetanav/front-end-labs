@@ -10,7 +10,15 @@ export default function Home() {
         <div className="text-center space-y-3">
           <h1 className="text-3xl font-bold">Random UIs</h1>
           <p className="text-sm text-muted-foreground">
-            Testing my frontend skills out
+            A small playground where I build UI ideas end-to-end: layout experiments,
+            motion studies, component patterns, and tiny product-ish flows. Nothing is
+            precious here, the goal is reps.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Each link is a self-contained mini project. Some are intentionally minimal,
+            some are over-designed, and most are an excuse to explore one specific thing
+            (state, interactions, spacing, typography, accessibility, performance) without
+            turning it into a full app.
           </p>
         </div>
 
@@ -54,6 +62,11 @@ export default function Home() {
             </Link>
           </CardContent>
         </Card>
+
+        <p className="text-xs text-muted-foreground text-center">
+          If you are here for a specific pattern, open one page and skim the markup.
+          This repo is meant to be readable and easy to remix.
+        </p>
       </main>
     </div>
   );

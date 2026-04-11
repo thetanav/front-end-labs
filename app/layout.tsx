@@ -8,9 +8,39 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+function getSiteUrl() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
+
 export const metadata: Metadata = {
-  title: "Front Labs",
-  description: "A beautiful application",
+  metadataBase: new URL(getSiteUrl()),
+  title: "Random UIs",
+  description:
+    "A small personal playground for building random UI experiments: micro-interactions, layout ideas, component patterns, and whatever else I want to prototype fast.",
+  openGraph: {
+    title: "Random UIs",
+    description:
+      "A small personal playground for building random UI experiments: micro-interactions, layout ideas, component patterns, and whatever else I want to prototype fast.",
+    type: "website",
+    url: "/",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Random UIs",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Random UIs",
+    description:
+      "A small personal playground for building random UI experiments: micro-interactions, layout ideas, component patterns, and whatever else I want to prototype fast.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function RootLayout({
